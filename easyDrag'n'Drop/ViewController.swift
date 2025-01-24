@@ -56,6 +56,8 @@ class ViewController: UICollectionViewController {
         
         var backgroundConf = cell.defaultBackgroundConfiguration()
         backgroundConf.backgroundColor = .yellow
+        backgroundConf.strokeWidth = 3
+        backgroundConf.strokeColor = .black
         cell.backgroundConfiguration = backgroundConf
     }
 
@@ -107,24 +109,24 @@ extension ViewController:  UICollectionViewDragDelegate, UICollectionViewDropDel
         withDestinationIndexPath destinationIndexPath: IndexPath?
     ) -> UICollectionViewDropProposal {
         
-        if let dstIdxPath = destinationIndexPath {
+//        if let dstIdxPath = destinationIndexPath {
+//        
+//            let srcItemID = session.localDragSession!.items.first!.localObject as! Card
+//            let dstItemID = dataSource.itemIdentifier(for: dstIdxPath)!
+//            
+//            if dstItemID != srcItemID {
+//                let srcIdxPath = dataSource.indexPath(for: srcItemID)!
+//                var snap = dataSource.snapshot()
+//                if dstIdxPath.item > srcIdxPath.item {
+//                    snap.moveItem(srcItemID, afterItem: dstItemID)
+//                } else {
+//                    snap.moveItem(srcItemID, beforeItem: dstItemID)
+//                }
+//                dataSource.apply(snap)
+//            }
+//        }
         
-            let srcItemID = session.localDragSession!.items.first!.localObject as! Card
-            let dstItemID = dataSource.itemIdentifier(for: dstIdxPath)!
-            
-            if dstItemID != srcItemID {
-                let srcIdxPath = dataSource.indexPath(for: srcItemID)!
-                var snap = dataSource.snapshot()
-                if dstIdxPath.item > srcIdxPath.item {
-                    snap.moveItem(srcItemID, afterItem: dstItemID)
-                } else {
-                    snap.moveItem(srcItemID, beforeItem: dstItemID)
-                }
-                dataSource.apply(snap)
-            }
-        }
-        
-        return UICollectionViewDropProposal(operation: .move)
+        return UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
     }
     
     
@@ -138,16 +140,16 @@ extension ViewController:  UICollectionViewDragDelegate, UICollectionViewDropDel
         let movedCard = cards.remove(at: coordinator.items.first!.sourceIndexPath!.item)
         cards.insert(movedCard, at: destinationIndexPath.item)
         
-        applySnapshot()
-        coordinator.drop(dragItem, toItemAt: destinationIndexPath)
+//        applySnapshot()
+//        coordinator.drop(dragItem, toItemAt: destinationIndexPath)
         
 //        let srcItemID = coordinator.session.localDragSession!.items.first!.localObject as! Card
 //        let dstItemID = dataSource.itemIdentifier(for: destinationIndexPath)!
 //        
-//        var anim = coordinator.drop(dragItem, toItemAt: destinationIndexPath)
-//        anim.addCompletion { _ in
-//            self.applySnapshot()
-//        }
+        var anim = coordinator.drop(dragItem, toItemAt: destinationIndexPath)
+        anim.addCompletion { _ in
+            self.applySnapshot()
+        }
     }
 }
 
