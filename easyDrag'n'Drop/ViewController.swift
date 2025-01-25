@@ -32,6 +32,7 @@ class ViewController: UICollectionViewController {
 
     
     var dataSource: UICollectionViewDiffableDataSource<Int, Card>!
+    var isFirstDropUpdate = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,6 +90,7 @@ extension ViewController {
 
 extension ViewController:  UICollectionViewDragDelegate, UICollectionViewDropDelegate {
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: any UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        isFirstDropUpdate = true
         let itemProvider = NSItemProvider(object: NSString())
         let dragItem = UIDragItem(itemProvider: itemProvider)
         dragItem.localObject = cards[indexPath.item]
@@ -109,24 +111,24 @@ extension ViewController:  UICollectionViewDragDelegate, UICollectionViewDropDel
         withDestinationIndexPath destinationIndexPath: IndexPath?
     ) -> UICollectionViewDropProposal {
         
-//        if let dstIdxPath = destinationIndexPath {
-//        
-//            let srcItemID = session.localDragSession!.items.first!.localObject as! Card
-//            let dstItemID = dataSource.itemIdentifier(for: dstIdxPath)!
-//            
-//            if dstItemID != srcItemID {
-//                let srcIdxPath = dataSource.indexPath(for: srcItemID)!
-//                var snap = dataSource.snapshot()
-//                if dstIdxPath.item > srcIdxPath.item {
-//                    snap.moveItem(srcItemID, afterItem: dstItemID)
-//                } else {
-//                    snap.moveItem(srcItemID, beforeItem: dstItemID)
-//                }
-//                dataSource.apply(snap)
-//            }
-//        }
+        if let dstIdxPath = destinationIndexPath {
         
-        return UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+            let srcItemID = session.localDragSession!.items.first!.localObject as! Card
+            let dstItemID = dataSource.itemIdentifier(for: dstIdxPath)!
+            
+            if dstItemID != srcItemID {
+                let srcIdxPath = dataSource.indexPath(for: srcItemID)!
+                var snap = dataSource.snapshot()
+                if dstIdxPath.item > srcIdxPath.item {
+                    snap.moveItem(srcItemID, afterItem: dstItemID)
+                } else {
+                    snap.moveItem(srcItemID, beforeItem: dstItemID)
+                }
+                dataSource.apply(snap)
+            }
+        }
+        
+        return UICollectionViewDropProposal(operation: .move)
     }
     
     
@@ -146,10 +148,7 @@ extension ViewController:  UICollectionViewDragDelegate, UICollectionViewDropDel
 //        let srcItemID = coordinator.session.localDragSession!.items.first!.localObject as! Card
 //        let dstItemID = dataSource.itemIdentifier(for: destinationIndexPath)!
 //        
-        var anim = coordinator.drop(dragItem, toItemAt: destinationIndexPath)
-        anim.addCompletion { _ in
-            self.applySnapshot()
-        }
+        let destCell = collectionView.cellForItem(at: destinationIndexPath)!
+        let anim = coordinator.drop(dragItem, intoItemAt: destinationIndexPath, rect: destCell.bounds)
     }
 }
-
